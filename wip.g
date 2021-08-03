@@ -1,17 +1,80 @@
+elementToNumber := function(g)
+    local powers, number, e;
+    powers := ExtRepOfObj(g);
+    powers := powers{[1, 3 .. Length(powers) - 1]};
+    number := 0;
+    for e in powers do
+        number := number + 2 ^ (e - 1);
+    od;
+    return number + 1;
+end;
+
 WeisfeilerLeman := function(G)
-    local groupIdOfG, i, allColors, j, g1, g2;
-    groupIdOfG := IdGroup(G);
+    local elementsOfGroup, conjugacyClasses, positionOfConjugates, conjugatorsForClasses, i, representative, conjugators, conjugator, positionConjugator, allColors, conjugacyClassRepresentatives, k, position, id, j, class, elm, g1, g2, r;
+    elementsOfGroup := ShallowCopy(Elements(G));
+    SortBy(elementsOfGroup, elementToNumber);
+    conjugacyClasses := ConjugacyClasses(G);
+    positionOfConjugates
+        := List(elementsOfGroup,
+                x -> List(elementsOfGroup,
+                          y -> elementToNumber(x ^ y)));
+    conjugatorsForClasses := List([1..Length(conjugacyClasses)], x -> []);
     i := 0;
+    for class in conjugacyClasses do
+        i := i  +  1;
+        representative := Representative(class);
+        # conjugators[j] is an element conjugating representative to
+        # AsList(class)[j].
+        conjugators := conjugatorsForClasses[i];
+        for elm in AsList(class) do
+            conjugator := RepresentativeAction(G, representative, elm);
+            positionConjugator := elementToNumber(conjugator);
+            Add(conjugators,
+                rec(positionConjugate := elementToNumber(elm),
+                    positionConjugator := positionConjugator));
+        od;
+    od;
+    # Next idea: also use the centralizer of g ^ x. Namely Group(g ^ x, h ^ x)
+    # is isomorphic to Group(g ^ x, h ^ (x * c)) where c centralizes g ^ x.
     allColors := List([1..Order(G)], x -> EmptyPlist(Order(G)));
-    for g1 in G do
-        i := i+1;
+    conjugacyClassRepresentatives := List(conjugacyClasses, Representative);
+    k := 0;
+    for g1 in conjugacyClassRepresentatives do
+        k := k + 1;
+        position := elementToNumber(g1);
+        conjugators := conjugatorsForClasses[k];
+        for g2 in elementsOfGroup do
+            id := IdGroup(Group(g1, g2));
+            # We identify each group element with its elementToNumber in
+            # elementsOfGroup. For each conjugate g1 ^ x we write id into
+            # allColors[g1 ^ x, g2 ^ x].
+            for r in conjugators do;
+                # i := elementToNumber(g1 ^ r.conjugator);
+                # j := elementToNumber(g2 ^ r.conjugator);
+                i := r.positionConjugate;
+                j := positionOfConjugates[
+                    elementToNumber(g2),
+                    r.positionConjugator
+                ];
+                allColors[i, j] := id;
+            od;
+        od;
+    od;
+    return allColors;
+end;
+
+WeisfeilerLemanCorrect := function(G)
+    local allColors, elementsOfGroup, i, j, g1, g2;
+    allColors := List([1..Order(G)], x -> EmptyPlist(Order(G)));
+    elementsOfGroup := Elements(G);
+    i := 0;
+    for g1 in elementsOfGroup do
+        i := i + 1;
         j := 0;
-        for g2 in G do
-            j := j+1;
-            # This check has to be thrown out eventually, since 2-generated G
-            # are solved by the zero-th coloring.
-            if IsSubgroup(Group(g1, g2), G) then
-                allColors[i, j] := groupIdOfG;
+        for g2 in elementsOfGroup do
+            j := j + 1;
+            if j < i then
+                allColors[i, j] := allColors[j, i];
             else
                 allColors[i, j] := IdGroup(Group(g1, g2));
             fi;
