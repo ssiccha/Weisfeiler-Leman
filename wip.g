@@ -20,21 +20,27 @@ WeisfeilerLeman := function(G)
     return allColors;
 end;
 
-WeisfeilerLemanRecursion := function(allColors)
+WeisfeilerLemanHumanReadable := function(G)
+    local coloringZero;
+    coloringZero := WeisfeilerLeman(G);
+    return Collected(Concatenation(coloringZero));
+end;
+
+WeisfeilerLemanRecursion := function(allColors, G)
     local nextStepAllColors, i, j, newColor, k, g1, g2, x;
     nextStepAllColors := List([1..Order(G)], x -> EmptyPlist(Order(G)));
     i := 0;
     for g1 in G do
-        i := i+1;
+        i := i + 1;
         j := 0;
         for g2 in G do
-            j := j+1;
+            j := j + 1;
             newColor := [];
             newColor[1] := allColors[i,j];
             newColor[2] := EmptyPlist(Length(allColors[1]));
             k := 0;
             for x in G do
-                k := k + 1;
+                k := k  +  1;
                 newColor[2][k] := [allColors[k, j], allColors[i, k]];
             od;
             # Form the multi-set of colors
@@ -48,9 +54,8 @@ end;
 
 timeSHOWMIN := 100;
 ColorPrompt(true, rec(
-# usually cyan bold, see ?TextAttr
   PrePrompt := function()
-   # show the ‘time’ automatically if at least timeSHOWMIN
+   # show the 'time' automatically if at least timeSHOWMIN
    if CPROMPT() = "gap> " and time >= timeSHOWMIN then
     Print("Time of last command: ", time, " ms\n");
    fi;
