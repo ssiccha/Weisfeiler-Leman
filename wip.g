@@ -11,13 +11,12 @@ end;
 
 WeisfeilerLeman := function(G)
     local elementsOfGroup, conjugacyClasses, positionOfConjugates, conjugatorsForClasses, i, representative, conjugators, conjugator, positionConjugator, allColors, conjugacyClassRepresentatives, k, position, id, j, class, elm, g1, g2, r;
-    elementsOfGroup := ShallowCopy(Elements(G));
-    SortBy(elementsOfGroup, elementToNumber);
+    elementsOfGroup := Elements(G);
     conjugacyClasses := ConjugacyClasses(G);
     positionOfConjugates
         := List(elementsOfGroup,
                 x -> List(elementsOfGroup,
-                          y -> elementToNumber(x ^ y)));
+                          y -> Position(elementsOfGroup, x ^ y)));
     conjugatorsForClasses := List([1..Length(conjugacyClasses)], x -> []);
     i := 0;
     for class in conjugacyClasses do
@@ -28,9 +27,9 @@ WeisfeilerLeman := function(G)
         conjugators := conjugatorsForClasses[i];
         for elm in AsList(class) do
             conjugator := RepresentativeAction(G, representative, elm);
-            positionConjugator := elementToNumber(conjugator);
+            positionConjugator := Position(elementsOfGroup, conjugator);
             Add(conjugators,
-                rec(positionConjugate := elementToNumber(elm),
+                rec(positionConjugate := Position(elementsOfGroup, elm),
                     positionConjugator := positionConjugator));
         od;
     od;
@@ -41,19 +40,19 @@ WeisfeilerLeman := function(G)
     k := 0;
     for g1 in conjugacyClassRepresentatives do
         k := k + 1;
-        position := elementToNumber(g1);
+        position := Position(elementsOfGroup, g1);
         conjugators := conjugatorsForClasses[k];
         for g2 in elementsOfGroup do
             id := IdGroup(Group(g1, g2));
-            # We identify each group element with its elementToNumber in
+            # We identify each group element with its Position in
             # elementsOfGroup. For each conjugate g1 ^ x we write id into
             # allColors[g1 ^ x, g2 ^ x].
             for r in conjugators do;
-                # i := elementToNumber(g1 ^ r.conjugator);
-                # j := elementToNumber(g2 ^ r.conjugator);
+                # i := Position(elementsOfGroup, g1 ^ r.conjugator);
+                # j := Position(elementsOfGroup, g2 ^ r.conjugator);
                 i := r.positionConjugate;
                 j := positionOfConjugates[
-                    elementToNumber(g2),
+                    Position(elementsOfGroup, g2),
                     r.positionConjugator
                 ];
                 allColors[i, j] := id;
