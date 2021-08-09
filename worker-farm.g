@@ -1,3 +1,8 @@
+# Call this on emil via bash as follows:
+# for i in 1 2 3 4 5 6 7 8 9 10; do
+#   gap -l "$HOME/projects/pkg;" -c 'workerId := '${i}'; nrTotalWorkers := 10;' worker-farm.g > logfile${i} 2>&1 &
+# done
+
 if not IsBound(workerId) then
     ErrorNoReturn("Must set workerId via -c command line option!");
 fi;
