@@ -30,3 +30,6 @@ true
 
 gap> twoProfile := TwoProfileMultiset(G);; time;
 28288
+
+gap> G := DihedralGroup(8);;
+gap> TwoProfileMultiset(G);;
