@@ -22,7 +22,7 @@ end;
 
 # TwoProfile: the list of isomorphism types of two-generated subgroups.
 TwoProfileMultiset := function(G)
-    local twoProfileHashMap, conjugacyClasses, g1, i, it, C, g2;
+    local twoProfileHashMap, conjugacyClasses, g1, i, it, C, g2, result;
     twoProfileHashMap := HashMap(ID_FUNC);
     conjugacyClasses := ConjugacyClasses(G);
     for C in conjugacyClasses do
@@ -37,7 +37,9 @@ TwoProfileMultiset := function(G)
         od;
     od;
     it := KeyValueIterator(twoProfileHashMap);
-    return List([1..Size(twoProfileHashMap)], i -> NextIterator(it));
+    result := List([1..Size(twoProfileHashMap)], i -> NextIterator(it));
+    SortBy(result, x -> x[1]);
+    return result;
 end;
 
 # Going over the conjugacy classes improves time from 45s to 35s for a group of
