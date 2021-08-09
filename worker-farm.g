@@ -20,7 +20,8 @@ fi;
 Print(myShare, "\n");
 
 fileName := Concatenation("TwoProfileMultisetsOrder256-", String(workerId));
-Print(fileName, "\n");
+Print("Clearing ", fileName, "\n");
+PrintTo(fileName, "");
 for i in [myShare.first .. myShare.last] do
     G := SmallGroup(256, i);
     Print(i, "\n");
