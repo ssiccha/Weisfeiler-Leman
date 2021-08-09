@@ -1,3 +1,11 @@
+nrSmallGroupsPerOrderLookupTable := List([1..512], n -> NrSmallGroups(n));
+nrSmallGroupsUpToOrder := List([1..512], n -> Sum(nrSmallGroupsPerOrderLookupTable{[1..(n-1)]}));
+
+invariantUsedForColoring := function(G)
+    id := IdSmallGroup(G);
+    return nrSmallGroupsUpToOrder[id[1]] + id[2];
+end;
+
 elementToNumber := function(g)
     local powers, number, e;
     powers := ExtRepOfObj(g);
@@ -9,7 +17,8 @@ elementToNumber := function(g)
     return number + 1;
 end;
 
-WeisfeilerLeman := function(G)
+# This improves time from 45s to 35s for a group of order 256.
+WeisfeilerLemanViaConjugacyClasses := function(G)
     local elementsOfGroup, conjugacyClasses, positionOfConjugates, conjugatorsForClasses, i, representative, conjugators, conjugator, positionConjugator, allColors, conjugacyClassRepresentatives, k, position, id, j, class, elm, g1, g2, r;
     elementsOfGroup := Elements(G);
     conjugacyClasses := ConjugacyClasses(G);
@@ -43,7 +52,7 @@ WeisfeilerLeman := function(G)
         position := Position(elementsOfGroup, g1);
         conjugators := conjugatorsForClasses[k];
         for g2 in elementsOfGroup do
-            id := IdGroup(Group(g1, g2));
+            id := invariantUsedForColoring(Group(g1, g2));
             # We identify each group element with its Position in
             # elementsOfGroup. For each conjugate g1 ^ x we write id into
             # allColors[g1 ^ x, g2 ^ x].
@@ -62,7 +71,7 @@ WeisfeilerLeman := function(G)
     return allColors;
 end;
 
-WeisfeilerLemanCorrect := function(G)
+WeisfeilerLeman := function(G)
     local allColors, elementsOfGroup, i, j, g1, g2;
     allColors := List([1..Order(G)], x -> EmptyPlist(Order(G)));
     elementsOfGroup := Elements(G);
@@ -75,7 +84,7 @@ WeisfeilerLemanCorrect := function(G)
             if j < i then
                 allColors[i, j] := allColors[j, i];
             else
-                allColors[i, j] := IdGroup(Group(g1, g2));
+                allColors[i, j] := invariantUsedForColoring(Group(g1, g2));
             fi;
         od;
     od;

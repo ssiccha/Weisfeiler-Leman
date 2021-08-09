@@ -21,3 +21,10 @@ gap> niceZero := Collected(Concatenation(colorZero));
 [ [ [ 1, 1 ], 1 ], [ [ 2, 1 ], 93 ], [ [ 4, 1 ], 1344 ], [ [ 4, 2 ], 930 ],
   [ [ 8, 2 ], 20160 ], [ [ 16, 2 ], 6144 ], [ [ 32, 2 ], 36864 ] ]
 Time of last command: 178 ms
+
+
+gap> colorZeroCorrect := WeisfeilerLeman(G);; time; colorZero := Weisfeile
+rLemanViaConjugacyClasses(G);; time; colorZeroCorrect = colorZero;
+53665
+40657
+true
