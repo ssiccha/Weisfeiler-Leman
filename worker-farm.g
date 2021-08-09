@@ -7,9 +7,7 @@ fi;
 
 Read("wip.g");
 
-# TODO
-# nrSmallGroups := NrSmallGroups(256);
-nrSmallGroups := 5;
+nrSmallGroups := NrSmallGroups(256);
 quotient := QuoInt(nrSmallGroups, nrTotalWorkers);
 myShare := rec(first := (workerId - 1) * quotient + 1);
 if workerId <> nrTotalWorkers then
@@ -27,6 +25,7 @@ for i in [myShare.first .. myShare.last] do
     Print(i, "\n");
     AppendTo(fileName, TwoProfileMultiset(G));
     if i <> myShare.last then
-        AppendTo(fileName, ",");
+        AppendTo(fileName, ",\n");
     fi;
 od;
+QuitGap(0);
