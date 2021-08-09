@@ -18,7 +18,7 @@ elementToNumber := function(g)
 end;
 
 # This improves time from 45s to 35s for a group of order 256.
-WeisfeilerLemanViaConjugacyClasses := function(G)
+TwoProfileViaConjugacyClasses := function(G)
     local elementsOfGroup, conjugacyClasses, positionOfConjugates, conjugatorsForClasses, i, representative, conjugators, conjugator, positionConjugator, allColors, conjugacyClassRepresentatives, k, position, id, j, class, elm, g1, g2, r;
     elementsOfGroup := Elements(G);
     conjugacyClasses := ConjugacyClasses(G);
@@ -71,7 +71,7 @@ WeisfeilerLemanViaConjugacyClasses := function(G)
     return allColors;
 end;
 
-WeisfeilerLeman := function(G)
+TwoProfile := function(G)
     local allColors, elementsOfGroup, i, j, g1, g2;
     allColors := List([1..Order(G)], x -> EmptyPlist(Order(G)));
     elementsOfGroup := Elements(G);
@@ -91,13 +91,13 @@ WeisfeilerLeman := function(G)
     return allColors;
 end;
 
-WeisfeilerLemanHumanReadable := function(G)
+TwoProfileHumanReadable := function(G)
     local coloringZero;
-    coloringZero := WeisfeilerLeman(G);
+    coloringZero := TwoProfile(G);
     return Collected(Concatenation(coloringZero));
 end;
 
-WeisfeilerLemanRecursion := function(allColors, G)
+TwoProfileRecursion := function(allColors, G)
     local nextStepAllColors, i, j, newColor, k, g1, g2, x;
     nextStepAllColors := List([1..Order(G)], x -> EmptyPlist(Order(G)));
     i := 0;
