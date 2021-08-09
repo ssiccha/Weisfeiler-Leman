@@ -1,7 +1,10 @@
+LoadPackage("datastructures");
+
 nrSmallGroupsPerOrderLookupTable := List([1..512], n -> NrSmallGroups(n));
 nrSmallGroupsUpToOrder := List([1..512], n -> Sum(nrSmallGroupsPerOrderLookupTable{[1..(n-1)]}));
 
 invariantUsedForColoring := function(G)
+    local id;
     id := IdSmallGroup(G);
     return nrSmallGroupsUpToOrder[id[1]] + id[2];
 end;
@@ -17,7 +20,28 @@ elementToNumber := function(g)
     return number + 1;
 end;
 
-# This improves time from 45s to 35s for a group of order 256.
+# TwoProfile: the list of isomorphism types of two-generated subgroups.
+TwoProfileMultiset := function(G)
+    local twoProfileHashMap, conjugacyClasses, g1, i, it, C, g2;
+    twoProfileHashMap := HashMap(ID_FUNC);
+    conjugacyClasses := ConjugacyClasses(G);
+    for C in conjugacyClasses do
+        g1 := Representative(C);
+        for g2 in G do
+            i := invariantUsedForColoring(Group(g1,g2));
+            if not i in twoProfileHashMap then
+                twoProfileHashMap[i] := Size(C);
+            else
+                twoProfileHashMap[i] := twoProfileHashMap[i] + Size(C);
+            fi;
+        od;
+    od;
+    it := KeyValueIterator(twoProfileHashMap);
+    return List([1..Size(twoProfileHashMap)], i -> NextIterator(it));
+end;
+
+# Going over the conjugacy classes improves time from 45s to 35s for a group of
+# order 128.
 TwoProfileViaConjugacyClasses := function(G)
     local elementsOfGroup, conjugacyClasses, positionOfConjugates, conjugatorsForClasses, i, representative, conjugators, conjugator, positionConjugator, allColors, conjugacyClassRepresentatives, k, position, id, j, class, elm, g1, g2, r;
     elementsOfGroup := Elements(G);
